@@ -11,6 +11,7 @@ State: .acsd/ is ephemeral cache. Git commits are permanent truth.
 
 ## Mandatory Frontmatter Rule
 ALL cascade documents MUST start with YAML frontmatter block:
+```yaml
 ---
 template_version: "1.0"
 file_type: "<vision|architecture|data_model|capsule|interface|adr>"
@@ -18,11 +19,13 @@ cascade_level: <0-5>
 required_fields: [field1, field2, ...]
 cascade_children: ["relative/path/*.md", ...]
 ---
+```
 Scripts validate frontmatter before any processing.
 Missing or invalid frontmatter = ERROR status (not CONFLICT).
 Frontmatter is machine-readable; content is human+AI readable.
 
 ## Cascade Hierarchy (Strict Top-Down)
+```
 L0: acsd/vision.md (Purpose, Scope, Actors, Invariants)
 L1: acsd/architecture/ (Components, Boundaries, Tech Stack) - file or folder with index.md
 L1: acsd/data_model.md (Entities, Relations, Ownership)
@@ -31,6 +34,7 @@ L2: **/<module-root>/acsd-module/capsule.md (Domain concepts, Operations)
 L3: **/<module-root>/acsd-module/interface.md (Public API, DTOs, Errors)
 L4: **/<module-root>/tests/contract/*.test.ts (Generated from Interface)
 L5: **/<module-root>/src/*.ts (Generated from Tests, stack-specific paths)
+```
 
 ## Document Structure Rule
 Any cascade level (except L0 vision, L3 interface) may be:
@@ -38,10 +42,12 @@ Any cascade level (except L0 vision, L3 interface) may be:
 - OR folder: architecture/ with index.md as entry point
 
 Folder structure example:
+```
   acsd/architecture/
     ├── index.md           # Required: entry point, links to all other files
     ├── components.md      # Optional: detailed component descriptions
     └── boundaries.md      # Optional: interaction rules
+```
 
 index.md must:
 - List all files in the folder
@@ -50,6 +56,7 @@ index.md must:
 - Contain frontmatter that aggregates required_fields from subfiles
 
 ## Module Structure
+```
 <module-root>/
   ├── acsd-module/        # L2-L3: ACSD artifacts
   │   ├── architecture/   # OR architecture.md (file or folder with index)
@@ -57,17 +64,20 @@ index.md must:
   │   └── interface.md
   ├── src/                # L5: Implementation (stack-specific)
   └── tests/              # L4: Contract tests (stack-specific)
+```
 
 CLI discovers modules by finding all **/acsd-module/ folders.
 Module root = parent directory of acsd-module/.
 Code and tests live alongside acsd-module/, not inside it.
 
 ## File States
+```
 OK: Spec matches Code and Tests pass.
 PENDING: File needs processing.
 ERROR: Syntax error, generation failure, or invalid frontmatter.
 CONFLICT: Semantic mismatch (Spec != Code). Requires human decision.
 EXCEPTION: Temporary approved drift (must have expiry).
+```
 
 ## Conflict Resolution Protocol
 1. Detection: Tests pass but contradict Spec, or Code cannot implement Spec.
@@ -91,6 +101,7 @@ Rule: Code can propose Spec change via ADR, but never ignore Spec silently.
 11. ALL markdown files MUST have valid YAML frontmatter as first block.
 
 ## Directory Structure
+```
 .acsd/acsd.db (State, Graph, History)
 acsd/vision.md
 acsd/architecture/          # L1: file or folder with index.md
@@ -106,6 +117,7 @@ acsd/adr/
 <module-root>/tests/        # L4 tests (stack-specific)
 tools/acsd/ (CLI)
 tools/acsd-templates/
+```
 
 ## Git Workflow
 Standard:
@@ -123,12 +135,14 @@ Hotfix:
 4. Create task to update spec later
 
 ## CLI Reference
+```
 acsd init                   # Init DB and structure
 acsd discover               # Find all acsd-module folders
 acsd validate [--full]      # Run cascade validation
 acsd status                 # Show current state
 acsd drift                  # List CONFLICTs
 acsd adr create <title>     # Start decision record
+```
 
 ## Template Variables
 {{PROJECT_NAME}}, {{MODULE_NAME}}, {{PARENT_REF}}, {{INVARIANT_N}}
